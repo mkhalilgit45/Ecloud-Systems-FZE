@@ -1,0 +1,67 @@
+from typing import Dict, Optional
+
+class User:
+    def __init__(self, username: str, password: str, active: bool):
+        self.username = username
+        self.password = password
+        self.active = active
+
+    def __repr__(self):
+        return f"User(username={self.username}, active={self.active})"
+
+class UserService:
+    def __init__(self):
+        self.users: Dict[str, User] = {}
+
+    def create_user(self, username: str, password: str, active: bool) -> User:
+        if username in self.users:
+            raise ValueError("User already exists")
+        user = User(username, password, active)
+        self.users[username] = user
+        return user
+
+    def get_user(self, username: str) -> Optional[User]:
+        return self.users.get(username)
+
+    def update_user(self, username: str, password: Optional[str] = None, active: Optional[bool] = None) -> Optional[User]:
+        user = self.users.get(username)
+        if not user:
+            raise ValueError("User not found")
+        
+        if password is not None:
+            user.password = password
+        if active is not None:
+            user.active = active
+        
+        return user
+
+    def delete_user(self, username: str) -> bool:
+        if username in self.users:
+            del self.users[username]
+            return True
+        return False
+
+    def list_users(self) -> Dict[str, User]:
+        return self.users
+
+# Example usage
+if __name__ == "__main__":
+    user_service = UserService()
+    
+    # Create users
+    user_service.create_user("john_doe", "password123", True)
+    user_service.create_user("jane_smith", "password456", False)
+    
+    # List users
+    print("All users:", user_service.list_users())
+    
+    # Get a user
+    print("Get user john_doe:", user_service.get_user("john_doe"))
+    
+    # Update a user
+    user_service.update_user("john_doe", password="newpassword123")
+    print("Updated user john_doe:", user_service.get_user("john_doe"))
+    
+    # Delete a user
+    user_service.delete_user("jane_smith")
+    print("All users after deletion:", user_service.list_users())
